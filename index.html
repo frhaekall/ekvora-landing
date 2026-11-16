@@ -1,0 +1,1610 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>EKVORA - VIDEO DOWNLOADER</title>
+
+        <meta
+            name="description"
+            content="A simple way to save videos from Instagram, TikTok, and Facebook."
+        />
+
+        <style>
+            /* =========================
+           GLOBAL VARIABLES
+        ========================= */
+
+            :root {
+                color-scheme: light;
+
+                --bg: #fffafa;
+                --surface: #ffffff;
+                --surface-soft: #fff3f3;
+                --text: #242424;
+                --muted: #858585;
+                --border: #f0e4e4;
+                --accent: #e63946;
+                --accent-hover: #ca2938;
+                --accent-soft: #ffe7e9;
+                --input-bg: #ffffff;
+                --shadow: 0 15px 45px rgba(0, 0, 0, 0.045);
+            }
+
+            html[data-theme="dark"] {
+                color-scheme: dark;
+
+                --bg: #111113;
+                --surface: #19191d;
+                --surface-soft: #21191b;
+                --text: #f3f3f3;
+                --muted: #99999f;
+                --border: #303035;
+                --accent: #f05260;
+                --accent-hover: #ff6975;
+                --accent-soft: #352024;
+                --input-bg: #202025;
+                --shadow: 0 15px 45px rgba(0, 0, 0, 0.2);
+            }
+
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font-family:
+                    Inter,
+                    -apple-system,
+                    BlinkMacSystemFont,
+                    "Segoe UI",
+                    sans-serif;
+            }
+
+            html {
+                scroll-behavior: smooth;
+            }
+
+            body {
+                background: var(--bg);
+                color: var(--text);
+                transition:
+                    background 0.3s ease,
+                    color 0.3s ease;
+            }
+
+            button,
+            input {
+                font: inherit;
+            }
+
+            a {
+                text-decoration: none;
+                color: inherit;
+            }
+
+            /* =========================
+           NAVIGATION
+        ========================= */
+
+            nav {
+                height: 82px;
+                padding: 0 9%;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                background: var(--surface);
+                border-bottom: 1px solid var(--border);
+                transition: 0.3s;
+            }
+
+            .logo {
+                font-size: 27px;
+                font-weight: 850;
+                letter-spacing: 1.5px;
+                color: var(--accent);
+            }
+
+            .logo span {
+                color: var(--text);
+            }
+
+            .nav-right {
+                display: flex;
+                align-items: center;
+                gap: 30px;
+            }
+
+            .nav-link {
+                font-size: 13px;
+                font-weight: 600;
+                color: var(--muted);
+                transition: 0.2s;
+            }
+
+            .nav-link:hover {
+                color: var(--accent);
+            }
+
+            .theme-toggle {
+                border: 1px solid var(--border);
+                background: var(--surface);
+                color: var(--text);
+                border-radius: 30px;
+                padding: 10px 15px;
+                cursor: pointer;
+                font-size: 12px;
+                font-weight: 600;
+                transition: 0.2s;
+            }
+
+            .theme-toggle:hover {
+                border-color: var(--accent);
+                color: var(--accent);
+            }
+
+            /* =========================
+           HERO
+        ========================= */
+
+            .hero {
+                padding: 110px 20px 85px;
+                text-align: center;
+                background: radial-gradient(
+                    ellipse at top,
+                    var(--surface-soft),
+                    var(--bg) 70%
+                );
+            }
+
+            .hero-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 9px;
+                padding: 9px 17px;
+                border-radius: 30px;
+                background: var(--accent-soft);
+                color: var(--accent);
+                font-size: 10px;
+                font-weight: 800;
+                letter-spacing: 2px;
+                margin-bottom: 28px;
+            }
+
+            .hero-badge::before {
+                content: "";
+                width: 6px;
+                height: 6px;
+                border-radius: 50%;
+                background: var(--accent);
+            }
+
+            .hero h1 {
+                font-size: clamp(42px, 7vw, 76px);
+                line-height: 1.08;
+                letter-spacing: -3px;
+                font-weight: 850;
+                margin-bottom: 23px;
+            }
+
+            .hero h1 span {
+                color: var(--accent);
+            }
+
+            .hero-description {
+                max-width: 570px;
+                margin: 0 auto 38px;
+                color: var(--muted);
+                font-size: 15px;
+                line-height: 1.9;
+            }
+
+            /* =========================
+           URL FORM
+        ========================= */
+
+            .download-wrapper {
+                max-width: 750px;
+                margin: auto;
+            }
+
+            .download-box {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 9px;
+                background: var(--surface);
+                border: 1px solid var(--border);
+                border-radius: 15px;
+                box-shadow: var(--shadow);
+            }
+
+            .download-box input {
+                flex: 1;
+                min-width: 0;
+                border: none;
+                outline: none;
+                background: transparent;
+                color: var(--text);
+                padding: 16px;
+                font-size: 13px;
+            }
+
+            .download-box input::placeholder {
+                color: var(--muted);
+            }
+
+            .download-box button {
+                border: none;
+                border-radius: 10px;
+                background: var(--accent);
+                color: white;
+                padding: 17px 25px;
+                font-size: 13px;
+                font-weight: 700;
+                cursor: pointer;
+                transition: 0.2s;
+                white-space: nowrap;
+            }
+
+            .download-box button:hover {
+                background: var(--accent-hover);
+                transform: translateY(-1px);
+            }
+
+            .download-box button:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+                transform: none;
+            }
+
+            .platform-label {
+                margin-top: 20px;
+                color: var(--muted);
+                font-size: 12px;
+                letter-spacing: 0.3px;
+            }
+
+            /* =========================
+           PREVIEW SECTION
+        ========================= */
+
+            .preview {
+                max-width: 900px;
+                padding: 10px 20px 85px;
+                margin: auto;
+            }
+
+            .preview-card {
+                background: var(--surface);
+                padding: 25px;
+                border-radius: 20px;
+                border: 1px solid var(--border);
+                box-shadow: var(--shadow);
+            }
+
+            .preview-placeholder {
+                min-height: 220px;
+                padding: 25px;
+                border: 1px dashed var(--border);
+                border-radius: 13px;
+                background: var(--surface-soft);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                color: var(--muted);
+                font-size: 14px;
+                line-height: 1.8;
+                overflow-wrap: anywhere;
+            }
+
+            .preview-placeholder h3 {
+                color: var(--accent);
+                margin-bottom: 10px;
+            }
+
+            /* =========================
+           EDITORIAL FEATURES
+        ========================= */
+
+            .features {
+                padding: 100px 9%;
+                background: var(--surface);
+                transition: 0.3s;
+            }
+
+            .features-heading {
+                max-width: 650px;
+                margin: 0 auto 65px;
+                text-align: center;
+            }
+
+            .features-heading span {
+                color: var(--accent);
+                font-size: 10px;
+                font-weight: 800;
+                letter-spacing: 3px;
+            }
+
+            .features-heading h2 {
+                font-size: clamp(32px, 4vw, 47px);
+                line-height: 1.2;
+                margin: 22px 0;
+                letter-spacing: -1.5px;
+            }
+
+            .features-heading h2 em {
+                color: var(--accent);
+                font-family: Georgia, serif;
+                font-weight: 400;
+            }
+
+            .features-heading p {
+                color: var(--muted);
+                font-size: 14px;
+                line-height: 1.8;
+            }
+
+            .feature-list {
+                max-width: 1050px;
+                margin: auto;
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                border-top: 1px solid var(--border);
+                border-bottom: 1px solid var(--border);
+            }
+
+            .feature {
+                display: flex;
+                gap: 18px;
+                padding: 35px 25px;
+                background: transparent;
+                border: none;
+                border-radius: 0;
+            }
+
+            .feature + .feature {
+                border-left: 1px solid var(--border);
+            }
+
+            .feature-number {
+                color: var(--accent);
+                font-size: 12px;
+                font-weight: 800;
+                padding-top: 4px;
+            }
+
+            .feature h3 {
+                font-size: 15px;
+                margin-bottom: 12px;
+            }
+
+            .feature p {
+                color: var(--muted);
+                font-size: 13px;
+                line-height: 1.8;
+            }
+
+            /* =========================
+           FOOTER
+        ========================= */
+
+            footer {
+                background: var(--bg);
+                border-top: 1px solid var(--border);
+                padding: 28px 9%;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 15px;
+                color: var(--muted);
+                font-size: 12px;
+            }
+
+            .footer-brand {
+                color: var(--accent);
+                font-weight: 800;
+                letter-spacing: 1px;
+            }
+
+            /* =========================
+           RESPONSIVE
+        ========================= */
+
+            @media (max-width: 750px) {
+                nav {
+                    padding: 0 6%;
+                    height: 72px;
+                }
+
+                .nav-right {
+                    gap: 15px;
+                }
+
+                .hero {
+                    padding: 80px 20px 65px;
+                }
+
+                .hero h1 {
+                    letter-spacing: -2px;
+                }
+
+                .download-box {
+                    flex-direction: column;
+                    align-items: stretch;
+                }
+
+                .download-box input {
+                    width: 100%;
+                }
+
+                .download-box button {
+                    width: 100%;
+                }
+
+                .preview {
+                    padding-bottom: 60px;
+                }
+
+                .preview-card {
+                    padding: 14px;
+                }
+
+                .features {
+                    padding: 75px 7%;
+                }
+
+                .feature-list {
+                    grid-template-columns: 1fr;
+                }
+
+                .feature {
+                    padding: 28px 10px;
+                }
+
+                .feature + .feature {
+                    border-left: none;
+                    border-top: 1px solid var(--border);
+                }
+
+                footer {
+                    flex-direction: column;
+                    text-align: center;
+                    padding: 25px 15px;
+                }
+            }
+
+            @media (max-width: 420px) {
+                .logo {
+                    font-size: 22px;
+                }
+
+                .nav-link {
+                    display: none;
+                }
+
+                .hero h1 {
+                    font-size: 42px;
+                }
+            }
+
+            /* =========================
+   EDITORIAL HERO
+========================= */
+
+            .hero {
+                padding: 105px 9% 100px;
+                background: radial-gradient(
+                    ellipse at 80% 20%,
+                    var(--surface-soft),
+                    var(--bg) 60%
+                );
+                transition: background 0.3s ease;
+            }
+
+            .hero-inner {
+                max-width: 1200px;
+                margin: auto;
+                display: grid;
+                grid-template-columns: 1.1fr 0.9fr;
+                align-items: center;
+                gap: 85px;
+            }
+
+            /* LEFT CONTENT */
+
+            .hero-eyebrow {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                color: var(--accent);
+                font-size: 10px;
+                font-weight: 800;
+                letter-spacing: 2.5px;
+                margin-bottom: 35px;
+            }
+
+            .hero-content h1 {
+                font-size: clamp(52px, 6.2vw, 82px);
+                line-height: 0.99;
+                letter-spacing: -5px;
+                font-weight: 850;
+                margin-bottom: 30px;
+            }
+
+            .hero-content h1 span {
+                color: var(--accent);
+                font-family: Georgia, serif;
+                font-style: italic;
+                font-weight: 400;
+                letter-spacing: -4px;
+            }
+
+            .hero-description {
+                max-width: 440px;
+                color: var(--muted);
+                font-size: 14px;
+                line-height: 1.9;
+            }
+
+            /* PLATFORM BRAND ROW */
+
+            .supported-platforms {
+                margin-top: 55px;
+            }
+
+            .platform-heading {
+                display: block;
+                color: var(--muted);
+                font-size: 9px;
+                font-weight: 800;
+                letter-spacing: 2px;
+                margin-bottom: 19px;
+            }
+
+            .platform-items {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 25px;
+            }
+
+            .platform-item {
+                display: flex;
+                align-items: center;
+                gap: 9px;
+                color: var(--text);
+                font-size: 12px;
+                font-weight: 600;
+            }
+
+            .platform-item svg {
+                width: 21px;
+                height: 21px;
+                color: var(--accent);
+            }
+
+            /* DOWNLOAD PANEL */
+
+            .download-panel {
+                background: var(--surface);
+                border: 1px solid var(--border);
+                border-radius: 4px;
+                padding: 30px;
+                box-shadow: var(--shadow);
+                transition: 0.3s;
+            }
+
+            .panel-top {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 10px;
+                padding-bottom: 20px;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .panel-label {
+                font-size: 9px;
+                font-weight: 800;
+                letter-spacing: 1.5px;
+                color: var(--muted);
+            }
+
+            .panel-status {
+                font-size: 8px;
+                font-weight: 800;
+                letter-spacing: 1px;
+                color: #279c69;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+
+            .panel-status span {
+                width: 6px;
+                height: 6px;
+                border-radius: 50%;
+                background: #279c69;
+            }
+
+            .panel-title {
+                padding: 35px 0 30px;
+            }
+
+            .panel-title h2 {
+                font-size: 25px;
+                letter-spacing: -0.8px;
+                margin-bottom: 10px;
+            }
+
+            .panel-title p {
+                color: var(--muted);
+                font-size: 12px;
+                line-height: 1.7;
+            }
+
+            /* FORM */
+
+            .download-box {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .download-box label {
+                color: var(--muted);
+                font-size: 9px;
+                font-weight: 800;
+                letter-spacing: 1.5px;
+            }
+
+            .download-box input {
+                width: 100%;
+                padding: 17px;
+                background: var(--input-bg);
+                border: 1px solid var(--border);
+                border-radius: 3px;
+                outline: none;
+                color: var(--text);
+                font-size: 12px;
+                transition: 0.2s;
+            }
+
+            .download-box input:focus {
+                border-color: var(--accent);
+            }
+
+            .download-box input::placeholder {
+                color: var(--muted);
+            }
+
+            .download-box button {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                width: 100%;
+                padding: 17px 19px;
+                border: none;
+                border-radius: 3px;
+                background: var(--accent);
+                color: white;
+                font-size: 12px;
+                font-weight: 700;
+                cursor: pointer;
+                transition: 0.2s;
+            }
+
+            .download-box button:hover {
+                background: var(--accent-hover);
+            }
+
+            .download-box button:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+            }
+
+            .button-arrow {
+                font-size: 18px;
+            }
+
+            .panel-bottom {
+                display: flex;
+                justify-content: space-between;
+                gap: 10px;
+                margin-top: 25px;
+                padding-top: 18px;
+                border-top: 1px solid var(--border);
+                color: var(--muted);
+                font-size: 8px;
+                font-weight: 700;
+                letter-spacing: 1px;
+            }
+
+            /* RESPONSIVE HERO */
+
+            @media (max-width: 900px) {
+                .hero {
+                    padding: 75px 7%;
+                }
+
+                .hero-inner {
+                    grid-template-columns: 1fr;
+                    gap: 55px;
+                }
+
+                .hero-content h1 {
+                    font-size: clamp(55px, 10vw, 75px);
+                }
+
+                .download-panel {
+                    max-width: 650px;
+                    width: 100%;
+                }
+            }
+
+            @media (max-width: 500px) {
+                .hero {
+                    padding: 65px 6%;
+                }
+
+                .hero-content h1 {
+                    font-size: 53px;
+                    letter-spacing: -3px;
+                }
+
+                .hero-content h1 span {
+                    letter-spacing: -2px;
+                }
+
+                .platform-items {
+                    gap: 17px;
+                }
+
+                .platform-item {
+                    font-size: 11px;
+                }
+
+                .download-panel {
+                    padding: 22px 18px;
+                }
+
+                .panel-bottom {
+                    font-size: 7px;
+                }
+            }
+
+            /* FIX PLATFORM ICON SIZES */
+
+            .platform-items {
+                display: flex;
+                align-items: center;
+                gap: 28px;
+            }
+
+            .platform-item {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                flex: 0 0 auto;
+            }
+
+            .platform-item svg {
+                display: block;
+                width: 20px !important;
+                height: 20px !important;
+                min-width: 20px;
+                max-width: 20px;
+                min-height: 20px;
+                max-height: 20px;
+                flex: 0 0 20px;
+            }
+
+            .platform-item span {
+                font-size: 12px;
+                white-space: nowrap;
+            }
+
+            /* =========================
+   SOLID BACKGROUND - NO GRADIENT
+========================= */
+
+            .hero {
+                background: var(--bg) !important;
+                background-image: none !important;
+            }
+
+            /* =========================
+   CENTER BUTTON TEXT
+========================= */
+
+            .download-box button {
+                position: relative;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+            }
+
+            .download-box button span:first-child {
+                text-align: center;
+            }
+
+            .download-box button .button-arrow {
+                position: absolute;
+                right: 19px;
+            }
+
+            /* =========================
+   EKVORA PAGE LOAD ANIMATION
+========================= */
+
+            @keyframes slideUpFade {
+                from {
+                    opacity: 0;
+                    transform: translateY(28px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes slideRightFade {
+                from {
+                    opacity: 0;
+                    transform: translateX(35px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
+
+            /* Left content */
+
+            .hero-eyebrow {
+                animation: slideUpFade 0.7s ease both;
+                animation-delay: 0.1s;
+            }
+
+            .hero-content h1 {
+                animation: slideUpFade 0.9s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+                animation-delay: 0.2s;
+            }
+
+            .hero-description {
+                animation: slideUpFade 0.8s ease both;
+                animation-delay: 0.4s;
+            }
+
+            .supported-platforms {
+                animation: slideUpFade 0.8s ease both;
+                animation-delay: 0.6s;
+            }
+
+            /* Download panel */
+
+            .download-panel {
+                animation: slideRightFade 0.9s cubic-bezier(0.2, 0.7, 0.3, 1)
+                    both;
+                animation-delay: 0.3s;
+            }
+
+            /* Platform hover */
+
+            .platform-item {
+                transition:
+                    color 0.25s ease,
+                    transform 0.25s ease;
+            }
+
+            .platform-item:hover {
+                color: var(--accent);
+                transform: translateY(-3px);
+            }
+
+            /* Button interaction */
+
+            .download-box button {
+                transition:
+                    background 0.25s ease,
+                    transform 0.25s ease;
+            }
+
+            .download-box button:hover {
+                transform: translateY(-2px);
+            }
+
+            /* Accessibility: respect reduced motion */
+
+            @media (prefers-reduced-motion: reduce) {
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
+
+            /* CENTER PLATFORM HEADING AND ICONS */
+
+            .hero-content .supported-platforms {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                width: 100%;
+                margin: 55px 0 0;
+            }
+
+            .hero-content .platform-heading {
+                display: block;
+                width: 100%;
+                text-align: center;
+                margin: 0 0 19px;
+            }
+
+            .hero-content .platform-items {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 100%;
+                gap: 28px;
+                flex-wrap: wrap;
+            }
+
+            .hero-content .platform-item {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                flex: 0 0 auto;
+            }
+
+            /* =========================
+   ABOUT US
+========================= */
+
+            .about-section {
+                padding: 100px 9%;
+                background: var(--bg);
+            }
+
+            .about-inner {
+                max-width: 1100px;
+                margin: auto;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 80px;
+                align-items: center;
+            }
+
+            .section-eyebrow {
+                color: var(--accent);
+                font-size: 10px;
+                font-weight: 800;
+                letter-spacing: 2.5px;
+            }
+
+            .about-content h2 {
+                font-size: clamp(35px, 4vw, 50px);
+                line-height: 1.15;
+                letter-spacing: -2px;
+                margin: 22px 0;
+            }
+
+            .about-content h2 em {
+                color: var(--accent);
+                font-family: Georgia, serif;
+                font-weight: 400;
+            }
+
+            .about-content p {
+                color: var(--muted);
+                font-size: 14px;
+                line-height: 1.9;
+                margin-bottom: 16px;
+            }
+
+            .about-card {
+                padding: 38px;
+                background: var(--surface);
+                border: 1px solid var(--border);
+                box-shadow: var(--shadow);
+            }
+
+            .about-card-number {
+                color: var(--accent);
+                font-size: 11px;
+                font-weight: 800;
+                letter-spacing: 2px;
+            }
+
+            .about-card h3 {
+                font-size: 25px;
+                line-height: 1.3;
+                margin: 22px 0 15px;
+            }
+
+            .about-card p {
+                color: var(--muted);
+                font-size: 13px;
+                line-height: 1.9;
+            }
+
+            .about-platforms {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                margin-top: 25px;
+            }
+
+            .about-platforms span {
+                padding: 9px 13px;
+                border: 1px solid var(--border);
+                color: var(--text);
+                font-size: 11px;
+                font-weight: 700;
+            }
+
+            /* =========================
+   FAQ
+========================= */
+
+            .faq-section {
+                padding: 100px 9%;
+                background: var(--surface);
+            }
+
+            .faq-inner {
+                max-width: 850px;
+                margin: auto;
+            }
+
+            .faq-heading {
+                text-align: center;
+                margin-bottom: 55px;
+            }
+
+            .faq-heading h2 {
+                font-size: clamp(32px, 4vw, 46px);
+                letter-spacing: -1.5px;
+                margin: 20px 0 15px;
+            }
+
+            .faq-heading h2 em {
+                color: var(--accent);
+                font-family: Georgia, serif;
+                font-weight: 400;
+            }
+
+            .faq-heading p {
+                color: var(--muted);
+                font-size: 13px;
+                line-height: 1.8;
+            }
+
+            .faq-list {
+                border-top: 1px solid var(--border);
+            }
+
+            .faq-item {
+                border-bottom: 1px solid var(--border);
+            }
+
+            .faq-item summary {
+                position: relative;
+                padding: 25px 45px 25px 5px;
+                color: var(--text);
+                font-size: 14px;
+                font-weight: 700;
+                cursor: pointer;
+                list-style: none;
+            }
+
+            .faq-item summary::-webkit-details-marker {
+                display: none;
+            }
+
+            .faq-item summary::after {
+                content: "+";
+                position: absolute;
+                right: 8px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: var(--accent);
+                font-size: 23px;
+                font-weight: 400;
+            }
+
+            .faq-item[open] summary::after {
+                content: "−";
+            }
+
+            .faq-answer {
+                padding: 0 35px 25px 5px;
+                color: var(--muted);
+                font-size: 13px;
+                line-height: 1.9;
+            }
+
+            /* RESPONSIVE ABOUT & FAQ */
+
+            @media (max-width: 750px) {
+                .about-section,
+                .faq-section {
+                    padding: 75px 7%;
+                }
+
+                .about-inner {
+                    grid-template-columns: 1fr;
+                    gap: 35px;
+                }
+
+                .about-card {
+                    padding: 28px;
+                }
+
+                .faq-heading {
+                    margin-bottom: 35px;
+                }
+
+                .faq-item summary {
+                    font-size: 13px;
+                    padding-right: 35px;
+                }
+            }
+        </style>
+    </head>
+
+    <body>
+        <!-- NAVIGATION -->
+        <nav>
+            <a href="/" class="logo">EK<span>VORA</span></a>
+
+            <div class="nav-right">
+                <a href="#about" class="nav-link">About Us</a>
+                <a href="#faq" class="nav-link">FAQ</a>
+
+                <button
+                    type="button"
+                    class="theme-toggle"
+                    id="themeToggle"
+                    aria-label="Toggle color theme"
+                    aria-pressed="false"
+                >
+                    ☾ Dark Mode
+                </button>
+            </div>
+        </nav>
+
+        <!-- HERO -->
+
+        <section class="hero">
+            <div class="hero-inner">
+                <div class="hero-content">
+                    <div class="hero-eyebrow">
+                        SOCIAL MEDIA VIDEO DOWNLOADER
+                    </div>
+
+                    <h1>
+                        Keep the<br />
+                        moments that<br />
+                        <span>move you.</span>
+                    </h1>
+
+                    <p class="hero-description">
+                        Your favorite content deserves a place beyond the
+                        scroll. Save videos you love, all in one simple
+                        experience.
+                    </p>
+
+                    <div
+                        class="supported-platforms"
+                        style="
+                            display: flex;
+                            flex-direction: column;
+                            align-items: flex-start;
+                            width: max-content;
+                            max-width: 100%;
+                            margin: 55px 0 0 0;
+                            text-align: left;
+                        "
+                    >
+                        <span
+                            class="platform-heading"
+                            style="
+                                display: block;
+                                width: max-content;
+                                text-align: left;
+                                margin: 0 0 19px 0;
+                            "
+                        >
+                            SUPPORTED PLATFORMS
+                        </span>
+
+                        <div
+                            class="platform-items"
+                            style="
+                                display: flex;
+                                justify-content: flex-start;
+                                align-items: center;
+                                width: max-content;
+                                margin: 0;
+                                padding: 0;
+                                gap: 25px;
+                            "
+                        >
+                            <!-- INSTAGRAM -->
+                            <div class="platform-item">
+                                <svg viewBox="0 0 24 24" aria-label="Instagram">
+                                    <rect
+                                        x="3"
+                                        y="3"
+                                        width="18"
+                                        height="18"
+                                        rx="5"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="1.8"
+                                    />
+                                    <circle
+                                        cx="12"
+                                        cy="12"
+                                        r="4"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="1.8"
+                                    />
+                                    <circle
+                                        cx="17.5"
+                                        cy="6.8"
+                                        r="1.2"
+                                        fill="currentColor"
+                                    />
+                                </svg>
+                                <span>Instagram</span>
+                            </div>
+
+                            <!-- TIKTOK -->
+                            <div class="platform-item">
+                                <svg viewBox="0 0 24 24" aria-label="TikTok">
+                                    <path
+                                        d="M14 3v11.2a4.1 4.1 0 1 1-3-3.95V7.1a7.1 7.1 0 1 0 6 7V9.2c1.5 1.1 3.2 1.7 5 1.8V7.8c-3.2-.1-5.8-2-6.2-4.8H14Z"
+                                        fill="currentColor"
+                                    />
+                                </svg>
+                                <span>TikTok</span>
+                            </div>
+
+                            <!-- FACEBOOK -->
+                            <div class="platform-item">
+                                <svg viewBox="0 0 24 24" aria-label="Facebook">
+                                    <path
+                                        d="M13.5 21v-8h2.8l.4-3.2h-3.2V7.7c0-.9.3-1.5 1.6-1.5h1.7V3.3c-.8-.1-1.6-.2-2.5-.2-2.5 0-4.2 1.5-4.2 4.3v2.4H7.3V13h2.8v8h3.4Z"
+                                        fill="currentColor"
+                                    />
+                                </svg>
+                                <span>Facebook</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="download-panel">
+                    <div class="panel-top">
+                        <span class="panel-label">VIDEO DOWNLOADER</span>
+                        <span class="panel-status"> READY TO START </span>
+                    </div>
+
+                    <div class="panel-title">
+                        <h2>Start with a link.</h2>
+                        <p>Paste your video URL below to get started.</p>
+                    </div>
+
+                    <form class="download-box" id="downloadForm">
+                        <label for="videoUrl">VIDEO URL</label>
+
+                        <input
+                            type="url"
+                            name="url"
+                            id="videoUrl"
+                            placeholder="https://..."
+                            required
+                        />
+
+                        <button type="submit" id="downloadButton">
+                            <span>Process Video</span>
+                        </button>
+                    </form>
+
+                    <div class="panel-bottom">
+                        <span>FAST & SIMPLE</span>
+                        <span>NO ACCOUNT REQUIRED</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIDEO PREVIEW -->
+        <section class="preview">
+            <div class="preview-card">
+                <div class="preview-placeholder" id="preview">
+                    <p>Your video preview will appear here.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- FEATURES -->
+        <section class="features" id="features">
+            <div class="features-heading">
+                <span>THE EKVORA EXPERIENCE</span>
+
+                <h2>
+                    Everything you need.<br />
+                    <em>Nothing you don't.</em>
+                </h2>
+
+                <p>A simpler way to save the videos that matter to you.</p>
+            </div>
+
+            <div class="feature-list">
+                <div class="feature">
+                    <span class="feature-number">01</span>
+
+                    <div>
+                        <h3>Simple by Design</h3>
+
+                        <p>
+                            No complicated steps. Just paste your link and get
+                            started.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="feature">
+                    <span class="feature-number">02</span>
+
+                    <div>
+                        <h3>Made for Every Platform</h3>
+
+                        <p>
+                            One place for videos from Instagram, TikTok, and
+                            Facebook.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="feature">
+                    <span class="feature-number">03</span>
+
+                    <div>
+                        <h3>Ready Anywhere</h3>
+
+                        <p>
+                            A seamless experience across desktop and mobile
+                            devices.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ABOUT US -->
+        <section class="about-section" id="about">
+            <div class="about-inner">
+                <div class="about-content">
+                    <span class="section-eyebrow">ABOUT EKVORA</span>
+
+                    <h2>
+                        Save moments.<br />
+                        Keep what <em>matters.</em>
+                    </h2>
+
+                    <p>
+                        EKVORA is a simple social media video downloader
+                        designed to help you save videos you love.
+                    </p>
+
+                    <p>
+                        We bring your favorite platforms into one simple
+                        experience. Just paste a video link, process it, preview
+                        the result, and download it.
+                    </p>
+                </div>
+
+                <div class="about-card">
+                    <span class="about-card-number">01 / OUR PURPOSE</span>
+
+                    <h3>
+                        One link.<br />
+                        One simple experience.
+                    </h3>
+
+                    <p>
+                        No complicated process. EKVORA makes saving publicly
+                        accessible videos easier through a clean and
+                        straightforward interface.
+                    </p>
+
+                    <div class="about-platforms">
+                        <span>Instagram</span>
+                        <span>TikTok</span>
+                        <span>Facebook</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ -->
+        <section class="faq-section" id="faq">
+            <div class="faq-inner">
+                <div class="faq-heading">
+                    <span class="section-eyebrow">NEED TO KNOW?</span>
+
+                    <h2>Frequently Asked <em>Questions.</em></h2>
+
+                    <p>Find answers to common questions about using EKVORA.</p>
+                </div>
+
+                <div class="faq-list">
+                    <details class="faq-item">
+                        <summary>
+                            How do I download a video using EKVORA?
+                        </summary>
+                        <div class="faq-answer">
+                            Copy the video link from Instagram, TikTok, or
+                            Facebook. Paste it into the EKVORA input field,
+                            click Process Video, then preview and download the
+                            available video.
+                        </div>
+                    </details>
+
+                    <details class="faq-item">
+                        <summary>Which platforms does EKVORA support?</summary>
+                        <div class="faq-answer">
+                            EKVORA currently supports publicly accessible video
+                            links from Instagram, TikTok, and Facebook.
+                        </div>
+                    </details>
+
+                    <details class="faq-item">
+                        <summary>Do I need to create an account?</summary>
+                        <div class="faq-answer">
+                            No. You can use the downloader directly without
+                            creating an account.
+                        </div>
+                    </details>
+
+                    <details class="faq-item">
+                        <summary>Why can't my video be processed?</summary>
+                        <div class="faq-answer">
+                            Make sure the URL is correct and the video is
+                            publicly accessible. Some links may fail because of
+                            platform restrictions or temporary service issues.
+                        </div>
+                    </details>
+
+                    <details class="faq-item">
+                        <summary>Why does my download link expire?</summary>
+                        <div class="faq-answer">
+                            The generated download link may only be valid for a
+                            limited time. If it expires, paste the original
+                            social media link into EKVORA and process it again.
+                        </div>
+                    </details>
+
+                    <details class="faq-item">
+                        <summary>Can I download private videos?</summary>
+                        <div class="faq-answer">
+                            EKVORA is intended for publicly accessible videos.
+                            It does not guarantee access to private or
+                            restricted content.
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer>
+            <div>© 2026 EKVORA. All rights reserved.</div>
+        </footer>
+
+        <!-- JAVASCRIPT -->
+        <script>
+            // =========================
+            // DARK MODE
+            // =========================
+
+            const themeToggle = document.getElementById("themeToggle");
+            const html = document.documentElement;
+
+            function applyTheme(theme) {
+                html.setAttribute("data-theme", theme);
+
+                const isDark = theme === "dark";
+
+                themeToggle.innerHTML = isDark ? "☀ Light Mode" : "☾ Dark Mode";
+
+                themeToggle.setAttribute(
+                    "aria-pressed",
+                    isDark ? "true" : "false",
+                );
+
+                localStorage.setItem("ekvora-theme", theme);
+            }
+
+            const savedTheme = localStorage.getItem("ekvora-theme");
+
+            applyTheme(savedTheme === "dark" ? "dark" : "light");
+
+            themeToggle.addEventListener("click", function () {
+                const currentTheme = html.getAttribute("data-theme");
+
+                applyTheme(currentTheme === "dark" ? "light" : "dark");
+            });
+
+            // =========================
+            // VIDEO URL PROCESSING
+            // =========================
+
+            // =========================
+            // VIDEO URL PROCESSING
+            // STATIC LANDING PAGE
+            // =========================
+
+            document
+                .getElementById("downloadForm")
+                .addEventListener("submit", function (e) {
+                    e.preventDefault();
+
+                    const url = document
+                        .getElementById("videoUrl")
+                        .value.trim();
+                    const preview = document.getElementById("preview");
+                    const button = document.getElementById("downloadButton");
+
+                    if (!url) {
+                        return;
+                    }
+
+                    let platform = "";
+
+                    if (url.includes("instagram.com")) {
+                        platform = "Instagram";
+                    } else if (url.includes("tiktok.com")) {
+                        platform = "TikTok";
+                    } else if (
+                        url.includes("facebook.com") ||
+                        url.includes("fb.watch")
+                    ) {
+                        platform = "Facebook";
+                    } else {
+                        preview.innerHTML = `
+                <div>
+                    <h3>Unsupported Platform</h3>
+                    <p>Please enter a valid Instagram, TikTok, or Facebook URL.</p>
+                </div>
+            `;
+                        return;
+                    }
+
+                    preview.innerHTML = `
+            <div>
+                <h3>${platform} Link Detected</h3>
+                <p>
+                    Your video link has been recognized.
+                    Video processing will be available once the
+                    EKVORA downloader service is connected.
+                </p>
+            </div>
+        `;
+
+                    button.querySelector("span").textContent = "Process Video";
+                });
+        </script>
+    </body>
+</html>
